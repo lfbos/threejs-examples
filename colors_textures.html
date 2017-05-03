@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, shrink-to-fit=no, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>ThreeJS - Ejemplos</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/custom.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="#">
+                        THREEJS
+                    </a>
+                </li>
+                <li>
+                    <a href="index.html">Cubo Simple</a>
+                </li>
+                <li>
+                    <a href="resize_window.html">Tamaño de Ventana dinámico</a>
+                </li>
+                <li>
+                    <a href="controls.html">Controles</a>
+                </li>
+                <li>
+                    <a href="colors_textures.html">Texturas & Colores</a>
+                </li>
+                <li>
+                    <a href="object_loader.html">Carga de Objetos</a>
+                </li>
+                <li>
+                    <a href="lights.html">Luces</a>
+                </li>
+                <li>
+                    <a href="stats.html">Estadísticas (FPS)</a>
+                </li>
+                <li>
+                    <a href="effects.html">Efectos</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="header">
+                            <a href="#menu-toggle" class="btn btn-default" id="menu-toggle"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+                            <h1>Ejemplos ThreeJS</h1>
+                        </div>
+                        <div id="viewport">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="js/lib/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/lib/bootstrap.min.js"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+        $("#menu-toggle").click(function (e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+        });
+    </script>
+
+    <!-- ThreeJS Library -->
+    <script src="js/lib/three.min.js"></script>
+
+    <!-- Orbit Controls -->
+    <script src="js/utils/OrbitControls.js"></script>
+
+    <!-- Colors & Textures -->
+    <script>
+        // Content size
+        var WIDTH = $('#viewport').innerWidth();
+        var HEIGHT = $('#viewport').innerHeight();
+
+        var scene = new THREE.Scene();
+
+        var camera = new THREE.PerspectiveCamera(75, WIDTH / HEIGHT, 0.1, 1000);
+
+        var renderer = new THREE.WebGLRenderer();
+
+        renderer.setSize(WIDTH, HEIGHT);
+        document.getElementById('viewport').appendChild(renderer.domElement);
+
+        window.addEventListener('resize', function () {
+            var W = $('#viewport').innerWidth();
+            var H = $('#viewport').innerHeight();
+            renderer.setSize(W, H);
+            camera.aspect = W / H;
+            camera.updateProjectionMatrix();
+        });
+
+        var cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
+
+        var cubeMaterials = [
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('img/1.png'), side: THREE.DoubleSide }), // RIGHT SIDE
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('img/2.png'), side: THREE.DoubleSide }), // LEFT SIDE
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('img/3.png'), side: THREE.DoubleSide }), // TOP SIDE
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('img/4.png'), side: THREE.DoubleSide }), // BOTTOM SIDE
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('img/5.png'), side: THREE.DoubleSide }), // FRONT SIDE
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('img/6.png'), side: THREE.DoubleSide }) // BACK SIDE
+        ];
+
+        var cubeMaterial = new THREE.MeshFaceMaterial(cubeMaterials);
+
+        var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        scene.add(cube);
+
+        camera.position.z = 5;
+
+        new THREE.OrbitControls(camera, renderer.domElement);
+
+        // Game Logic
+        var update = function () {
+        };
+
+        // Draw scene
+        var render = function () {
+            renderer.render(scene, camera);
+        };
+
+        // Run game loop (update, render, repeat)
+
+        var GameLoop = function () {
+            requestAnimationFrame(GameLoop);
+
+            update();
+            render();
+        };
+
+        GameLoop();
+    </script>
+</body>
+
+</html>
