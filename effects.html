@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>ThreeJS - Ejemplos</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, shrink-to-fit=no, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <style>
+        body {
+            background: #777;
+            padding: 0;
+            margin: 0;
+            font-weight: bold;
+            overflow: hidden;
+        }
+        
+        #info {
+            position: absolute;
+            top: 0px;
+            width: 100%;
+            color: #ffffff;
+            padding: 5px;
+            font-family: Monospace;
+            font-size: 13px;
+            text-align: center;
+            z-index: 1000;
+        }
+        
+        a {
+            color: #ffffff;
+        }
+        
+        #oldie a {
+            color: #da0
+        }
+    </style>
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/custom.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="#">
+                        THREEJS
+                    </a>
+                </li>
+                <li>
+                    <a href="index.html">Cubo Simple</a>
+                </li>
+                <li>
+                    <a href="resize_window.html">Tamaño de Ventana dinámico</a>
+                </li>
+                <li>
+                    <a href="controls.html">Controles</a>
+                </li>
+                <li>
+                    <a href="colors_textures.html">Texturas & Colores</a>
+                </li>
+                <li>
+                    <a href="object_loader.html">Carga de Objetos</a>
+                </li>
+                <li>
+                    <a href="lights.html">Luces</a>
+                </li>
+                <li>
+                    <a href="stats.html">Estadísticas (FPS)</a>
+                </li>
+                <li>
+                    <a href="effects.html">Efectos</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="header">
+                            <a href="#menu-toggle" class="btn btn-default" id="menu-toggle"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+                            <h1>Ejemplos ThreeJS</h1>
+                        </div>
+                        <div id="viewport">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="js/lib/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/lib/bootstrap.min.js"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+        $("#menu-toggle").click(function (e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+        });
+    </script>
+
+    <!-- ThreeJS Library -->
+    <script src="js/lib/three.min.js"></script>
+
+    <!-- Orbit Controls -->
+    <script src="js/utils/OrbitControls.js"></script>
+
+    <!-- Effect -->
+    <script src="js/utils/AnaglyphEffect.js"></script>
+
+    <script>
+        // Content size
+        var WIDTH = $('#viewport').innerWidth();
+        var HEIGHT = $('#viewport').innerHeight();
+
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(60, WIDTH / HEIGHT, 0.01, 100);
+        camera.position.z = 3;
+        camera.focalLength = 3;
+
+        var renderer = new THREE.WebGLRenderer({ antialias: false });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('viewport').appendChild(renderer.domElement);
+
+        window.addEventListener('resize', function () {
+            var W = $('#viewport').innerWidth();
+            var H = $('#viewport').innerHeight();
+            renderer.setSize(W, H);
+            camera.aspect = W / H;
+            camera.updateProjectionMatrix();
+        });
+
+        var effect = new THREE.AnaglyphEffect(renderer);
+        effect.setSize(WIDTH, HEIGHT);
+
+        new THREE.OrbitControls(camera, renderer.domElement);
+
+        var spheres = [];
+
+        var textureCube = new THREE.CubeTextureLoader().load([
+            'img/metal.png', 'img/metal.png',
+            'img/metal.png', 'img/metal.png',
+            'img/metal.png', 'img/metal.png'
+        ]);
+
+        var geometry = new THREE.SphereBufferGeometry(0.1, 32, 16);
+        var material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, envMap: textureCube });
+
+        for (var i = 0; i < 200; i++) {
+
+            var mesh = new THREE.Mesh(geometry, material);
+
+            mesh.position.x = Math.random() * 10 - 5;
+            mesh.position.y = Math.random() * 10 - 5;
+            mesh.position.z = Math.random() * 10 - 5;
+
+            mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
+
+            scene.add(mesh);
+            spheres.push(mesh);
+        }
+
+        function update() {
+            var timer = 0.0001 * Date.now();
+
+            for (var i = 0, il = spheres.length; i < il; i++) {
+
+                var sphere = spheres[i];
+
+                sphere.position.x = 5 * Math.cos(timer + i);
+                sphere.position.y = 5 * Math.sin(timer + i * 1.1);
+            }
+        };
+
+        function render() {
+            effect.render(scene, camera);
+        };
+
+        var GameLoop = function () {
+            requestAnimationFrame(GameLoop);
+
+            update();
+            render();
+        }
+
+        GameLoop();
+    </script>
+
+</body>
+
+</html>
