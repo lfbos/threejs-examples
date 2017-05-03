@@ -35,7 +35,7 @@
 
 <body>
 
-    <div id="wrapper">
+    <div id="wrapper" class="toggled">
 
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
@@ -74,20 +74,8 @@
         <!-- /#sidebar-wrapper -->
 
         <!-- Page Content -->
-        <div id="page-content-wrapper">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="header">
-                            <a href="#menu-toggle" class="btn btn-default" id="menu-toggle"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
-                            <h1>Ejemplos ThreeJS</h1>
-                        </div>
-                        <div id="viewport">
-                            <div id="stats"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div id="viewport">
+            <div id="stats"></div>
         </div>
         <!-- /#page-content-wrapper -->
 
@@ -99,14 +87,6 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="js/lib/bootstrap.min.js"></script>
-
-    <!-- Menu Toggle Script -->
-    <script>
-        $("#menu-toggle").click(function (e) {
-            e.preventDefault();
-            $("#wrapper").toggleClass("toggled");
-        });
-    </script>
 
     <!-- ThreeJS Library -->
     <script src="js/lib/three.min.js"></script>
@@ -127,8 +107,8 @@
         document.getElementById('stats').appendChild(stats.dom);
 
         // Content size
-        var WIDTH = $('#viewport').innerWidth();
-        var HEIGHT = $('#viewport').innerHeight();
+        var WIDTH = Math.abs(window.innerWidth - $('#sidebar-wrapper').innerWidth());
+        var HEIGHT = window.innerHeight;
 
         var scene = new THREE.Scene();
 
@@ -140,8 +120,8 @@
         document.getElementById('viewport').appendChild(renderer.domElement);
 
         window.addEventListener('resize', function () {
-            var W = $('#viewport').innerWidth();
-            var H = $('#viewport').innerHeight();
+            var W = Math.abs(window.innerWidth - $('#sidebar-wrapper').innerWidth());
+            var H = window.innerHeight;
             renderer.setSize(W, H);
             camera.aspect = W / H;
             camera.updateProjectionMatrix();
@@ -155,6 +135,10 @@
         loader.load(
             'models/skull.json',
             function (object) {
+                object.scale.set(0.5, 0.5, 0.5);
+                object.rotation.y = 135;
+                object.rotation.x = 0.4;
+                object.position.y = -1.5;
                 scene.add(object);
             }
         );
@@ -173,7 +157,7 @@
         var GameLoop = function () {
             requestAnimationFrame(GameLoop);
 
-            stats.begin();            
+            stats.begin();
             update();
             render();
             stats.end();
