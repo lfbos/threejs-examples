@@ -83,12 +83,18 @@
     <script src="js/lib/bootstrap.min.js"></script>
 
     <!-- ThreeJS Library -->
-    <script src="js/lib/three.min.js"></script>
+    <script src="js/lib/three-75.min.js"></script>
 
     <!-- Orbit Controls -->
-    <script src="js/utils/OrbitControls.js"></script>
+    <script src="js/utils/OrbitControls-75.js"></script>
+    
+    <!-- Stereo Effect -->
+    <script src="js/utils/StereoEffect.js"></script>
+    
+    <!-- Device Orientation Controls -->
+    <script src="js/utils/DeviceOrientationControls.js"></script>
 
-    <!-- Controles -->
+    <!-- Colors & Textures -->
     <script>
         // Content size
         var WIDTH = Math.abs(window.innerWidth - $('#sidebar-wrapper').innerWidth());
@@ -97,36 +103,98 @@
         var scene = new THREE.Scene();
 
         var camera = new THREE.PerspectiveCamera(75, WIDTH / HEIGHT, 0.1, 1000);
-        
+
         var renderer = new THREE.WebGLRenderer();
 
+        var effect = new THREE.StereoEffect(renderer);
+
         renderer.setSize(WIDTH, HEIGHT);
+        effect.setSize(WIDTH, HEIGHT);
+
         document.getElementById('viewport').appendChild(renderer.domElement);
 
         window.addEventListener('resize', function () {
             var W = Math.abs(window.innerWidth - $('#sidebar-wrapper').innerWidth());
             var H = window.innerHeight;
             renderer.setSize(W, H);
+            effect.setSize(W, H);
             camera.aspect = W / H;
             camera.updateProjectionMatrix();
         });
 
         var cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
-        var cubeMaterial = new THREE.MeshBasicMaterial({ color: 0x00DDFF, wireframe: true });
+
+        var lambertMaterials = [
+            new THREE.MeshLambertMaterial({ map: new THREE.ImageUtils.loadTexture('img/1.png'), side: THREE.DoubleSide }), // RIGHT SIDE
+            new THREE.MeshLambertMaterial({ map: new THREE.ImageUtils.loadTexture('img/2.png'), side: THREE.DoubleSide }), // LEFT SIDE
+            new THREE.MeshLambertMaterial({ map: new THREE.ImageUtils.loadTexture('img/3.png'), side: THREE.DoubleSide }), // TOP SIDE
+            new THREE.MeshLambertMaterial({ map: new THREE.ImageUtils.loadTexture('img/4.png'), side: THREE.DoubleSide }), // BOTTOM SIDE
+            new THREE.MeshLambertMaterial({ map: new THREE.ImageUtils.loadTexture('img/5.png'), side: THREE.DoubleSide }), // FRONT SIDE
+            new THREE.MeshLambertMaterial({ map: new THREE.ImageUtils.loadTexture('img/6.png'), side: THREE.DoubleSide }) // BACK SIDE
+        ];
+
+        var phongMaterials = [
+            new THREE.MeshPhongMaterial({ map: new THREE.ImageUtils.loadTexture('img/1.png'), side: THREE.DoubleSide }), // RIGHT SIDE
+            new THREE.MeshPhongMaterial({ map: new THREE.ImageUtils.loadTexture('img/2.png'), side: THREE.DoubleSide }), // LEFT SIDE
+            new THREE.MeshPhongMaterial({ map: new THREE.ImageUtils.loadTexture('img/3.png'), side: THREE.DoubleSide }), // TOP SIDE
+            new THREE.MeshPhongMaterial({ map: new THREE.ImageUtils.loadTexture('img/4.png'), side: THREE.DoubleSide }), // BOTTOM SIDE
+            new THREE.MeshPhongMaterial({ map: new THREE.ImageUtils.loadTexture('img/5.png'), side: THREE.DoubleSide }), // FRONT SIDE
+            new THREE.MeshPhongMaterial({ map: new THREE.ImageUtils.loadTexture('img/6.png'), side: THREE.DoubleSide }) // BACK SIDE
+        ];
+
+        // var cubeMaterials = phongMaterials;
+        var cubeMaterials = lambertMaterials;
+
+        var cubeMaterial = new THREE.MeshFaceMaterial(cubeMaterials);
+
         var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
         scene.add(cube);
+
+        // Left Wall
+        var leftWallGeometry = new THREE.CubeGeometry(1, 10, 10);
+        var leftWallMaterial = new THREE.MeshLambertMaterial({ map: new THREE.ImageUtils.loadTexture('img/Wall.jpg'), side: THREE.DoubleSide });
+        var leftWallCube = new THREE.Mesh(leftWallGeometry, leftWallMaterial);
+        leftWallCube.position.x = -5;
+        scene.add(leftWallCube);
+
+        // Right Wall
+        var rightWallGeometry = new THREE.CubeGeometry(1, 10, 10);
+        var rightWallMaterial = new THREE.MeshLambertMaterial({ map: new THREE.ImageUtils.loadTexture('img/Wall.jpg'), side: THREE.DoubleSide });
+        var rightWallCube = new THREE.Mesh(rightWallGeometry, rightWallMaterial);
+        rightWallCube.position.x = 5;
+        scene.add(rightWallCube);
 
         camera.position.z = 5;
 
         new THREE.OrbitControls(camera, renderer.domElement);
 
+        var ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.2);
+        scene.add(ambientLight);
+
+        var spotLight = new THREE.PointLight(0xFF45F6, 1);
+        spotLight.position.set(0, 3, 0);
+        scene.add(spotLight);
+
+        function setOrientationControls(e) {
+          if (!e.alpha) {
+            return;
+          }
+
+          controls = new THREE.DeviceOrientationControls(camera, true);
+          controls.connect();
+          controls.update();
+
+          window.removeEventListener('deviceorientation', setOrientationControls, true);
+        }
+        window.addEventListener('deviceorientation', setOrientationControls, true);
+
         // Game Logic
-        var update = function () {            
+        var update = function () {
         };
 
         // Draw scene
         var render = function () {
-            renderer.render(scene, camera);
+            effect.render(scene, camera);
         };
 
         // Run game loop (update, render, repeat)
